@@ -1,11 +1,12 @@
 {
   "name": "hotel-offer-orchestrator",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Hotel offer orchestration using Node.js, TypeScript, Temporal and Redis",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
+    "start:worker": "node dist/worker.js",
     "start": "node dist/server.js"
   },
   "keywords": [],
