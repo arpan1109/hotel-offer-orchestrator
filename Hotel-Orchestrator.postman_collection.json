@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "Hotel-Orchestrator",
+    "description": "Postman tests for the Hotel Offer Orchestrator API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Delhi Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:3000/api/hotels?city=delhi",
+        "description": "Hotel Offer Orchestrator API test."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const hotels = pm.response.json();",
+              "pm.test('Response contains four hotels', function () {",
+              "    pm.expect(hotels).to.be.an('array').with.lengthOf(4);",
+              "});",
+              "pm.test('Hotels are deduplicated by name', function () {",
+              "    const names = hotels.map(h => h.name.toLowerCase());",
+              "    pm.expect(new Set(names).size).to.eql(names.length);",
+              "});",
+              "pm.test('Every hotel has required fields', function () {",
+              "    hotels.forEach(h => {",
+              "        pm.expect(h).to.have.all.keys('name', 'price', 'supplier', 'commissionPct');",
+              "        pm.expect(h.name).to.be.a('string');",
+              "        pm.expect(h.price).to.be.a('number');",
+              "        pm.expect(h.supplier).to.be.a('string');",
+              "        pm.expect(h.commissionPct).to.be.a('number');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Delhi Low Budget",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=5000&maxPrice=7000",
+        "description": "Hotel Offer Orchestrator API test."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const hotels = pm.response.json();",
+              "pm.test('Returns two hotels in the requested price range', function () {",
+              "    pm.expect(hotels).to.be.an('array').with.lengthOf(2);",
+              "    hotels.forEach(h => pm.expect(h.price).to.be.within(5000, 7000));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Delhi High Budget",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:3000/api/hotels?city=delhi&minPrice=10000&maxPrice=15000",
+        "description": "Hotel Offer Orchestrator API test."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "const hotels = pm.response.json();",
+              "pm.test('Returns two hotels in the requested price range', function () {",
+              "    pm.expect(hotels).to.be.an('array').with.lengthOf(2);",
+              "    hotels.forEach(h => pm.expect(h.price).to.be.within(10000, 15000));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "No Hotels Available",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:3000/api/hotels?city=jaipur",
+        "description": "Hotel Offer Orchestrator API test."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Returns an empty array when no hotels match', function () {",
+              "    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "Missing City",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "http://localhost:3000/api/hotels",
+        "description": "Hotel Offer Orchestrator API test."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('Returns a validation error', function () {",
+              "    pm.expect(pm.response.json()).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}
