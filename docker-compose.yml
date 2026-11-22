@@ -1,0 +1,41 @@
+
+services:
+  temporal:
+    image: temporalio/temporal:latest
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    command: server start-dev --ip 0.0.0.0
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      TEMPORAL_ADDRESS: temporal:7233
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - temporal
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: node dist/worker.js
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      SUPPLIER_API_URL: http://api:3000
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - temporal
+      - redis
+      - api
+    restart: unless-stopped
